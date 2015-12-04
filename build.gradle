@@ -1,0 +1,15 @@
+group 'com.kosakorner'
+version '1.0'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://ci.sgray.me/spigot-build/mr'
+    }
+}
+
+dependencies {
+    compile 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+}
