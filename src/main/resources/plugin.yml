@@ -4,4 +4,5 @@ author: kosakriszi
 main: com.kosakorner.spectator.Spectator
 commands:
   spectate:
+    aliases: [s]
     description: Access to spectate.
