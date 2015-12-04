@@ -1,0 +1,7 @@
+name: Spectator
+version: 1.0
+author: kosakriszi
+main: com.kosakorner.spectator.Spectator
+commands:
+  spectate:
+    description: Access to spectate.
