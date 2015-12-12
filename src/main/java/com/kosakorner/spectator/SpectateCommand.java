@@ -19,34 +19,33 @@ public class SpectateCommand implements CommandExecutor, TabCompleter {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (args.length == 1) {
-                Player target = Bukkit.getPlayer(args[0]);
-                if (target != null) {
-                    toggleGameMode(player);
-                    player.teleport(target);
-                    sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
-                }
-                else {
-                    sender.sendMessage(ChatColor.RED + args[0] + " isn't online!");
+                if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+                    Player target = Bukkit.getPlayer(args[0]);
+                    if (target != null) {
+                        player.setGameMode(GameMode.SPECTATOR);
+                        player.teleport(target);
+                        sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
+                    }
+                    else {
+                        sender.sendMessage(ChatColor.RED + args[0] + " isn't online!");
+                    }
+                    return true;
                 }
             }
             else {
-                toggleGameMode(player);
-                sender.sendMessage(ChatColor.AQUA + "You are now spectating!");
+                if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+                    player.setGameMode(GameMode.SPECTATOR);
+                    sender.sendMessage(ChatColor.AQUA + "You are now spectating!");
+                    return true;
+                }
             }
+            player.setGameMode(GameMode.SURVIVAL);
+            sender.sendMessage(ChatColor.RED + "You are no longer spectating!");
         }
         else {
             sender.sendMessage(ChatColor.RED + "You must be a player to run this command!");
         }
         return true;
-    }
-
-    private void toggleGameMode(Player player) {
-        if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-            player.setGameMode(GameMode.SPECTATOR);
-        }
-        else {
-            player.setGameMode(GameMode.SURVIVAL);
-        }
     }
 
     @Override
