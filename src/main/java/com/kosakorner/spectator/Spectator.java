@@ -9,7 +9,7 @@ public class Spectator extends JavaPlugin {
     public void onEnable() {
         SpectateCommand commandExecutor = new SpectateCommand();
         PluginCommand command = getCommand("spectate");
-        command.setPermission("spectate.use");
+        command.setPermission("spectator.use");
         command.setExecutor(commandExecutor);
         command.setTabCompleter(commandExecutor);
     }

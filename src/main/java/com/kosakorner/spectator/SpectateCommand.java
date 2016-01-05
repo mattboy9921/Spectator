@@ -3,6 +3,7 @@ package com.kosakorner.spectator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,7 +19,7 @@ public class SpectateCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length == 1) {
+            if (args.length == 1 && sender.hasPermission("spectator.use.teleport")) {
                 if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
                     Player target = Bukkit.getPlayer(args[0]);
                     if (target != null) {
@@ -39,6 +40,9 @@ public class SpectateCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
             }
+            // Check if the location is safe.
+            Location location = player.getLocation();
+
             player.setGameMode(GameMode.SURVIVAL);
             sender.sendMessage(ChatColor.RED + "You are no longer spectating!");
         }
