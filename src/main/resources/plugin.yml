@@ -2,7 +2,16 @@ name: Spectator
 version: 1.0
 author: kosakriszi
 main: com.kosakorner.spectator.Spectator
+
 commands:
   spectate:
     aliases: [spec]
     description: Access to spectate.
+    permission: spectator.use
+
+permissions:
+  spectator.*:
+    description: Access to all Spectator commands.
+    children:
+      spectator.use: true
+      spectator.teleport: true

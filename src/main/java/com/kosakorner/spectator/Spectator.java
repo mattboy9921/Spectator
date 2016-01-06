@@ -5,13 +5,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Spectator extends JavaPlugin {
 
+    public static final String PERM_TELEPORT = "spectate.teleport";
+
     @Override
     public void onEnable() {
         SpectateCommand commandExecutor = new SpectateCommand();
         PluginCommand command = getCommand("spectate");
-        command.setPermission("spectator.use");
         command.setExecutor(commandExecutor);
-        command.setTabCompleter(commandExecutor);
     }
 
 }

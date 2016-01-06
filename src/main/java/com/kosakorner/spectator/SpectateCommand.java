@@ -4,20 +4,16 @@ import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SpectateCommand implements CommandExecutor, TabCompleter {
+public class SpectateCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length == 1 && sender.hasPermission("spectator.use.teleport")) {
+            if (args.length > 0 && sender.hasPermission(Spectator.PERM_TELEPORT)) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
                     player.setGameMode(GameMode.SPECTATOR);
@@ -41,7 +37,7 @@ public class SpectateCommand implements CommandExecutor, TabCompleter {
             Location location = player.getLocation();
             float pitch = location.getPitch();
             float yaw = location.getYaw();
-            if (!location.getBlock().getType().equals(Material.AIR)) {
+            if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
                 location = location.getWorld().getHighestBlockAt(location).getLocation();
                 location.setPitch(pitch);
                 location.setYaw(yaw);
@@ -54,18 +50,6 @@ public class SpectateCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ChatColor.RED + "You must be a player to run this command!");
         }
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        List<String> matches = new ArrayList<>();
-        if (args.length == 1) {
-            for (Player player : Bukkit.matchPlayer(args[0])) {
-                matches.add(player.getName());
-            }
-            return matches;
-        }
-        return matches;
     }
 
 }
