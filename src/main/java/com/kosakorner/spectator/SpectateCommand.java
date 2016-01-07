@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class SpectateCommand implements CommandExecutor {
 
@@ -17,16 +18,20 @@ public class SpectateCommand implements CommandExecutor {
             if (args.length > 0 && sender.hasPermission(Spectator.PERM_TELEPORT)) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
+                    if (target.getUniqueId().equals(player.getUniqueId())) {
+                        sender.sendMessage(ChatColor.RED + "You can't spectate yourself!");
+                        return true;
+                    }
                     player.setGameMode(GameMode.SPECTATOR);
                     player.teleport(target, PlayerTeleportEvent.TeleportCause.SPECTATE);
                     player.setSpectatorTarget(target);
-                    sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
                     if (Spectator.showInventories && player.hasPermission(Spectator.PERM_INVENTORY)) {
                         Spectator.inventories.put(player, player.getInventory().getContents());
                         player.getInventory().clear();
                         player.getInventory().setContents(target.getInventory().getContents());
                         player.updateInventory();
                     }
+                    sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
                 }
                 else {
                     sender.sendMessage(ChatColor.RED + args[0] + " isn't online!");
@@ -51,6 +56,17 @@ public class SpectateCommand implements CommandExecutor {
             }
             player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
             player.setGameMode(GameMode.SURVIVAL);
+            if (Spectator.showInventories && player.hasPermission(Spectator.PERM_INVENTORY)) {
+                if (Spectator.inventories.containsKey(player)) {
+                    player.getInventory().clear();
+                    ItemStack[] items = Spectator.inventories.get(player);
+                    Spectator.inventories.remove(player);
+                    if (items != null) {
+                        player.getInventory().setContents(items);
+                    }
+                    player.updateInventory();
+                }
+            }
             sender.sendMessage(ChatColor.RED + "You are no longer spectating!");
         }
         else {

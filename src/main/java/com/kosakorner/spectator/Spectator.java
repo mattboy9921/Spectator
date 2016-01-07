@@ -23,7 +23,7 @@ public class Spectator extends JavaPlugin {
         SpectateCommand commandExecutor = new SpectateCommand();
         PluginCommand command = getCommand("spectate");
         command.setExecutor(commandExecutor);
-        Bukkit.getPluginManager().registerEvents(new PlayerManager(), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerHandler(), this);
         if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
             showInventories = true;
             new PacketHandler(this);

@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class PlayerManager implements Listener {
+public class PlayerHandler implements Listener {
 
     @EventHandler
     @SuppressWarnings("deprecation,unused")
