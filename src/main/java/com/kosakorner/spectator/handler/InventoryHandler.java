@@ -1,4 +1,4 @@
-package com.kosakorner.spectator;
+package com.kosakorner.spectator.handler;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -7,7 +7,7 @@ import org.bukkit.inventory.PlayerInventory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InventoryManager {
+public class InventoryHandler {
 
     private static final Map<Player, ItemStack[]> inventories = new HashMap<>();
     private static final Map<Player, ItemStack[]> armorStacks = new HashMap<>();

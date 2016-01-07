@@ -1,5 +1,10 @@
-package com.kosakorner.spectator;
+package com.kosakorner.spectator.command;
 
+import com.kosakorner.spectator.Spectator;
+import com.kosakorner.spectator.config.Config;
+import com.kosakorner.spectator.config.Messages;
+import com.kosakorner.spectator.config.Permissions;
+import com.kosakorner.spectator.handler.InventoryHandler;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,31 +19,37 @@ public class SpectateCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length > 0 && sender.hasPermission(Spectator.PERM_TELEPORT)) {
+            if (args.length > 0 && sender.hasPermission(Permissions.TELEPORT)) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
                     if (target.getUniqueId().equals(player.getUniqueId())) {
-                        sender.sendMessage(ChatColor.RED + "You can't spectate yourself!");
+                        sender.sendMessage(Messages.translate("Messages.Spectate.Self"));
                         return true;
                     }
                     player.setGameMode(GameMode.SPECTATOR);
                     player.teleport(target, PlayerTeleportEvent.TeleportCause.SPECTATE);
                     player.setSpectatorTarget(target);
-                    if (player.hasPermission(Spectator.PERM_INVENTORY)) {
-                        InventoryManager.swapInventories(player, target);
+                    if (player.hasPermission(Permissions.INVENTORY)) {
+                        InventoryHandler.swapInventories(player, target);
                     }
                     Spectator.spectators.put(player, target);
-                    sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
+                    if (Config.hideFromTab && Spectator.protocolLibPresent) {
+                        Spectator.playerHider.hidePlayer(player);
+                    }
+                    sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));
                 }
                 else {
-                    sender.sendMessage(ChatColor.RED + args[0] + " isn't online!");
+                    sender.sendMessage(Messages.translate("Messages.Player.Offline", "player", args[0]));
                 }
                 return true;
             }
             else {
                 if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
                     player.setGameMode(GameMode.SPECTATOR);
-                    sender.sendMessage(ChatColor.AQUA + "You are now spectating!");
+                    if (Config.hideFromTab && Spectator.protocolLibPresent) {
+                        Spectator.playerHider.hidePlayer(player);
+                    }
+                    sender.sendMessage(Messages.translate("Messages.Spectate.General"));
                     return true;
                 }
             }
@@ -52,15 +63,18 @@ public class SpectateCommand implements CommandExecutor {
                 location.setYaw(yaw);
             }
             player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            player.setGameMode(GameMode.SURVIVAL);
-            if (player.hasPermission(Spectator.PERM_INVENTORY)) {
-                InventoryManager.restoreInventory(player);
-            }
             Spectator.spectators.remove(player);
-            sender.sendMessage(ChatColor.RED + "You are no longer spectating!");
+            player.setGameMode(GameMode.SURVIVAL);
+            if (player.hasPermission(Permissions.INVENTORY)) {
+                InventoryHandler.restoreInventory(player);
+            }
+            if (Config.hideFromTab && Spectator.protocolLibPresent) {
+                Spectator.playerHider.showPlayer(player);
+            }
+            sender.sendMessage(Messages.translate("Messages.Spectate.Off"));
         }
         else {
-            sender.sendMessage(ChatColor.RED + "You must be a player to run this command!");
+            sender.sendMessage(Messages.translate("Messages.Player.NotPlayer"));
         }
         return true;
     }

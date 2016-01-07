@@ -9,11 +9,20 @@ commands:
     aliases: [spec]
     description: Access to spectate.
     permission: spectator.use
+  spectatereload:
+    aliases: [specreload]
+    description: Reload the plugin's configs.
+    permission: spectator.reload
 
 permissions:
-  spectator.*:
+  spectator.use.*:
     description: Access to all Spectator commands.
     children:
-      spectator.use: true
-      spectator.teleport: true
-      spectator.inventory: true
+      spectator.use.teleport: true
+      spectator.use.inventory: true
+  spectator.bypass.*:
+    description: Bypass certain Spectator features.
+    children:
+      spectator.bypass.tablist: true
+  spectator.reload:
+    description: Access to reload all Spectator configs.
