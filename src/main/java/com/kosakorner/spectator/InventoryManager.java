@@ -23,6 +23,14 @@ public class InventoryManager {
     }
 
     @SuppressWarnings("deprecation")
+    public static void resendInventoy(Player player, Player target) {
+        target.getInventory().clear();
+        target.getInventory().setContents(player.getInventory().getContents());
+        target.getInventory().setArmorContents(player.getInventory().getArmorContents());
+        target.updateInventory();
+    }
+
+    @SuppressWarnings("deprecation")
     public static void restoreInventory(Player player) {
         if (inventories.containsKey(player)) {
             PlayerInventory inventory = player.getInventory();

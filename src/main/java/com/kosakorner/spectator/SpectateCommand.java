@@ -27,6 +27,7 @@ public class SpectateCommand implements CommandExecutor {
                     if (player.hasPermission(Spectator.PERM_INVENTORY)) {
                         InventoryManager.swapInventories(player, target);
                     }
+                    Spectator.spectators.put(player, target);
                     sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
                 }
                 else {
@@ -55,6 +56,7 @@ public class SpectateCommand implements CommandExecutor {
             if (player.hasPermission(Spectator.PERM_INVENTORY)) {
                 InventoryManager.restoreInventory(player);
             }
+            Spectator.spectators.remove(player);
             sender.sendMessage(ChatColor.RED + "You are no longer spectating!");
         }
         else {

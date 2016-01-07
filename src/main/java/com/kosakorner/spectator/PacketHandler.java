@@ -31,6 +31,7 @@ public class PacketHandler {
                                     if (player.hasPermission(Spectator.PERM_INVENTORY)) {
                                         InventoryManager.swapInventories(player, target);
                                     }
+                                    Spectator.spectators.put(player, target);
                                 }
                             }
                         }
