@@ -21,6 +21,12 @@ public class SpectateCommand implements CommandExecutor {
                     player.teleport(target, PlayerTeleportEvent.TeleportCause.SPECTATE);
                     player.setSpectatorTarget(target);
                     sender.sendMessage(ChatColor.AQUA + "You are now spectating " + target.getName() + "!");
+                    if (Spectator.showInventories && player.hasPermission(Spectator.PERM_INVENTORY)) {
+                        Spectator.inventories.put(player, player.getInventory().getContents());
+                        player.getInventory().clear();
+                        player.getInventory().setContents(target.getInventory().getContents());
+                        player.updateInventory();
+                    }
                 }
                 else {
                     sender.sendMessage(ChatColor.RED + args[0] + " isn't online!");
