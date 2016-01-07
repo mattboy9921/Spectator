@@ -14,7 +14,6 @@ import org.bukkit.plugin.Plugin;
 
 public class PacketHandler {
 
-    @SuppressWarnings("deprecation")
     public PacketHandler(Plugin plugin) {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
@@ -30,10 +29,7 @@ public class PacketHandler {
                                 if (entity.getType().equals(EntityType.PLAYER)) {
                                     Player target = (Player) entity;
                                     if (player.hasPermission(Spectator.PERM_INVENTORY)) {
-                                        Spectator.inventories.put(player, player.getInventory().getContents());
-                                        player.getInventory().clear();
-                                        player.getInventory().setContents(target.getInventory().getContents());
-                                        player.updateInventory();
+                                        InventoryManager.swapInventories(player, target);
                                     }
                                 }
                             }
