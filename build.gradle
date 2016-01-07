@@ -8,8 +8,12 @@ repositories {
     maven {
         url = 'https://hub.spigotmc.org/nexus/content/groups/public'
     }
+    maven {
+        url = 'http://repo.dmulloy2.net/content/groups/public'
+    }
 }
 
 dependencies {
     compile 'org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT'
+    compile 'com.comphenix.protocol:ProtocolLib:3.6.4'
 }

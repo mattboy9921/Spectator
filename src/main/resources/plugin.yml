@@ -2,6 +2,7 @@ name: Spectator
 version: 1.0
 author: kosakriszi
 main: com.kosakorner.spectator.Spectator
+softdepend: [ProtocolLib]
 
 commands:
   spectate:
@@ -15,3 +16,4 @@ permissions:
     children:
       spectator.use: true
       spectator.teleport: true
+      spectator.inventory: true

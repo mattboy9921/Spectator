@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 public class SpectateCommand implements CommandExecutor {
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
