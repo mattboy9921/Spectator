@@ -27,7 +27,7 @@ public class SpectateCommand implements CommandExecutor {
                         return true;
                     }
                     player.setGameMode(GameMode.SPECTATOR);
-                    player.teleport(target, PlayerTeleportEvent.TeleportCause.SPECTATE);
+                    player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
                     player.setSpectatorTarget(target);
                     if (player.hasPermission(Permissions.INVENTORY)) {
                         InventoryHandler.swapInventories(player, target);

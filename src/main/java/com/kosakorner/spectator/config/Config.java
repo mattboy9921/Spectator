@@ -15,21 +15,19 @@ public class Config {
     public static void loadConfig() {
         File configFile = new File(Spectator.instance.getDataFolder(), "config.yml");
         FileConfiguration config;
-        if (!configFile.exists()) {
-            config = new YamlConfiguration();
-            config.set("Spectator.MirrorInventory", true);
-            config.set("Spectator.HideFromTab", false);
-            try {
+        try {
+            if (!configFile.exists()) {
+                config = new YamlConfiguration();
                 config.save(configFile);
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
+            config = YamlConfiguration.loadConfiguration(configFile);
+            config.set("Spectator.MirrorInventory", mirrorInventory = config.getBoolean("Spectator.MirrorInventory", true));
+            config.set("Spectator.HideFromTab", hideFromTab = config.getBoolean("Spectator.HideFromTab", false));
+            config.save(configFile);
         }
-        config = YamlConfiguration.loadConfiguration(configFile);
-
-        mirrorInventory = config.getBoolean("Spectator.MirrorInventory", true);
-        hideFromTab = config.getBoolean("Spectator.HideFromTab", false);
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

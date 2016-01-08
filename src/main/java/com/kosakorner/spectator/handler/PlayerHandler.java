@@ -1,6 +1,7 @@
 package com.kosakorner.spectator.handler;
 
 import com.kosakorner.spectator.Spectator;
+import com.kosakorner.spectator.config.Messages;
 import com.kosakorner.spectator.config.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -23,6 +25,16 @@ public class PlayerHandler implements Listener {
 
     public PlayerHandler(Plugin plugin) {
         this.plugin = plugin;
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<Player, Player> entry : Spectator.spectators.entrySet()) {
+                    entry.getKey().teleport(entry.getValue(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                    entry.getKey().setSpectatorTarget(entry.getKey());
+                    entry.getKey().setSpectatorTarget(entry.getValue());
+                }
+            }
+        }, 0, 20);
     }
 
     @EventHandler
@@ -46,6 +58,7 @@ public class PlayerHandler implements Listener {
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
         if (Spectator.spectators.containsKey(player)) {
+            player.sendMessage(Messages.translate("Messages.Player.GameModeBlocked"));
             event.setCancelled(true);
         }
     }

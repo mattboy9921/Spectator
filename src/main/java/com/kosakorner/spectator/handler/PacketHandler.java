@@ -50,6 +50,7 @@ public class PacketHandler {
                         }
                     }
                 }).syncStart();
+
     }
 
     public void showPlayer(Player player) {
@@ -69,13 +70,8 @@ public class PacketHandler {
             infoData.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(player), getPlayerPing(player), EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode()), WrappedChatComponent.fromText(player.getPlayerListName())));
             packet.getPlayerInfoDataLists().write(0, infoData);
             for (Player target : Bukkit.getOnlinePlayers()) {
-                if (show) {
+                if (!target.hasPermission(Permissions.BYPASS_TABLIST)) {
                     protocolManager.sendServerPacket(target, packet);
-                }
-                else {
-                    if (!target.hasPermission(Permissions.BYPASS_TABLIST)) {
-                        protocolManager.sendServerPacket(target, packet);
-                    }
                 }
             }
         }
