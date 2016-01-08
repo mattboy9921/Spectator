@@ -26,6 +26,10 @@ public class SpectateCommand implements CommandExecutor {
                         sender.sendMessage(Messages.translate("Messages.Spectate.Self"));
                         return true;
                     }
+                    if (Spectator.spectatorRelations.get(player) == target) {
+                        sender.sendMessage(Messages.translate("Messages.Spectate.NoChange", "player", target.getName()));
+                        return true;
+                    }
                     player.setGameMode(GameMode.SPECTATOR);
                     player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
                     player.setSpectatorTarget(target);
