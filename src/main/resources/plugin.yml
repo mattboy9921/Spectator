@@ -1,5 +1,5 @@
 name: Spectator
-version: 1.1
+version: 1.1.1
 author: kosakriszi
 main: com.kosakorner.spectator.Spectator
 softdepend: [ProtocolLib]
