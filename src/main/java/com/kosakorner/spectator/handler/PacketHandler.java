@@ -44,7 +44,7 @@ public class PacketHandler {
                                     if (player.hasPermission(Permissions.INVENTORY)) {
                                         InventoryHandler.swapInventories(player, target);
                                     }
-                                    Spectator.spectators.put(player, target);
+                                    Spectator.spectatorRelations.put(player, target);
                                 }
                             }
                         }

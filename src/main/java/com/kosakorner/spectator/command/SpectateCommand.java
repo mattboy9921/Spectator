@@ -32,8 +32,9 @@ public class SpectateCommand implements CommandExecutor {
                     if (player.hasPermission(Permissions.INVENTORY)) {
                         InventoryHandler.swapInventories(player, target);
                     }
-                    Spectator.spectators.put(player, target);
-                    if (Config.hideFromTab && Spectator.protocolLibPresent) {
+                    Spectator.trackedSpectators.add(player);
+                    Spectator.spectatorRelations.put(player, target);
+                    if (Config.hideFromTab) {
                         Spectator.playerHider.hidePlayer(player);
                     }
                     sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));
@@ -46,29 +47,33 @@ public class SpectateCommand implements CommandExecutor {
             else {
                 if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
                     player.setGameMode(GameMode.SPECTATOR);
-                    if (Config.hideFromTab && Spectator.protocolLibPresent) {
+                    Spectator.trackedSpectators.add(player);
+                    if (Config.hideFromTab) {
                         Spectator.playerHider.hidePlayer(player);
                     }
                     sender.sendMessage(Messages.translate("Messages.Spectate.General"));
                     return true;
                 }
             }
-            // Check if the location is safe.
-            Location location = player.getLocation();
-            float pitch = location.getPitch();
-            float yaw = location.getYaw();
-            if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
-                location = location.getWorld().getHighestBlockAt(location).getLocation();
-                location.setPitch(pitch);
-                location.setYaw(yaw);
+            if (player.getGameMode().equals(GameMode.SPECTATOR)) {
+                // Check if the location is safe.
+                Location location = player.getLocation();
+                float pitch = location.getPitch();
+                float yaw = location.getYaw();
+                if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
+                    location = location.getWorld().getHighestBlockAt(location).getLocation();
+                    location.setPitch(pitch);
+                    location.setYaw(yaw);
+                }
+                player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
-            player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            Spectator.spectators.remove(player);
+            Spectator.trackedSpectators.remove(player);
+            Spectator.spectatorRelations.remove(player);
             player.setGameMode(GameMode.SURVIVAL);
             if (player.hasPermission(Permissions.INVENTORY)) {
                 InventoryHandler.restoreInventory(player);
             }
-            if (Config.hideFromTab && Spectator.protocolLibPresent) {
+            if (Config.hideFromTab) {
                 Spectator.playerHider.showPlayer(player);
             }
             sender.sendMessage(Messages.translate("Messages.Spectate.Off"));

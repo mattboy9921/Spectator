@@ -8,12 +8,15 @@ import com.kosakorner.spectator.handler.InventoryHandler;
 import com.kosakorner.spectator.handler.PacketHandler;
 import com.kosakorner.spectator.handler.PlayerHandler;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Spectator extends JavaPlugin {
 
@@ -21,13 +24,19 @@ public class Spectator extends JavaPlugin {
 
     public static PacketHandler playerHider;
 
-    public static boolean protocolLibPresent = false;
-
-    public static final Map<Player, Player> spectators = new HashMap<>();
+    public static final Set<Player> trackedSpectators = new HashSet<>();
+    public static final Map<Player, Player> spectatorRelations = new HashMap<>();
 
     @Override
     public void onEnable() {
         instance = this;
+
+        if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+            log("&4ProtocolLib is not enabled, shutting down. You must install ProtocolLib for this plugin to work!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         getDataFolder().mkdir();
         Config.loadConfig();
         Messages.loadMessages();
@@ -38,15 +47,16 @@ public class Spectator extends JavaPlugin {
         command.setExecutor(new SpectateReloadCommand());
 
         Bukkit.getPluginManager().registerEvents(new PlayerHandler(this), this);
-        protocolLibPresent = Bukkit.getPluginManager().isPluginEnabled("ProtocolLib");
-        if (protocolLibPresent) {
-            playerHider = new PacketHandler(this);
-        }
+        playerHider = new PacketHandler(this);
     }
 
     @Override
     public void onDisable() {
         InventoryHandler.restoreAllInventories();
+    }
+
+    public static void log(String message) {
+        Bukkit.getConsoleSender().sendMessage("[Spectator] " + ChatColor.translateAlternateColorCodes('&', message));
     }
 
 }

@@ -28,7 +28,7 @@ public class PlayerHandler implements Listener {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
             @Override
             public void run() {
-                for (Map.Entry<Player, Player> entry : Spectator.spectators.entrySet()) {
+                for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
                     entry.getKey().teleport(entry.getValue(), PlayerTeleportEvent.TeleportCause.PLUGIN);
                     entry.getKey().setSpectatorTarget(entry.getKey());
                     entry.getKey().setSpectatorTarget(entry.getValue());
@@ -48,7 +48,7 @@ public class PlayerHandler implements Listener {
                     if (player.hasPermission(Permissions.INVENTORY)) {
                         InventoryHandler.restoreInventory(player);
                     }
-                    Spectator.spectators.remove(player);
+                    Spectator.spectatorRelations.remove(player);
                 }
             }
         }
@@ -57,7 +57,7 @@ public class PlayerHandler implements Listener {
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
         Player player = event.getPlayer();
-        if (Spectator.spectators.containsKey(player)) {
+        if (Spectator.trackedSpectators.contains(player)) {
             player.sendMessage(Messages.translate("Messages.Player.GameModeBlocked"));
             event.setCancelled(true);
         }
@@ -77,7 +77,7 @@ public class PlayerHandler implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
-                for (Map.Entry<Player, Player> entry : Spectator.spectators.entrySet()) {
+                for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
                     if (entry.getValue().equals(player)) {
                         InventoryHandler.resendInventoy(player, entry.getKey());
                     }
