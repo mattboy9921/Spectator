@@ -22,7 +22,8 @@ public class Spectator extends JavaPlugin {
 
     public static Spectator instance;
 
-    public static PacketHandler playerHider;
+    public static PlayerHandler playerHandler;
+    public static PacketHandler packetHandler;
 
     public static final Set<Player> trackedSpectators = new HashSet<>();
     public static final Map<Player, Player> spectatorRelations = new HashMap<>();
@@ -46,8 +47,9 @@ public class Spectator extends JavaPlugin {
         command = getCommand("spectatereload");
         command.setExecutor(new SpectateReloadCommand());
 
-        Bukkit.getPluginManager().registerEvents(new PlayerHandler(this), this);
-        playerHider = new PacketHandler(this);
+        playerHandler = new PlayerHandler(this);
+        packetHandler = new PacketHandler(this);
+        Bukkit.getPluginManager().registerEvents(playerHandler, this);
     }
 
     @Override

@@ -1,16 +1,14 @@
 package com.kosakorner.spectator.command;
 
 import com.kosakorner.spectator.Spectator;
-import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
 import com.kosakorner.spectator.config.Permissions;
-import com.kosakorner.spectator.handler.InventoryHandler;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 public class SpectateCommand implements CommandExecutor {
 
@@ -30,17 +28,7 @@ public class SpectateCommand implements CommandExecutor {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoChange", "player", target.getName()));
                         return true;
                     }
-                    player.setGameMode(GameMode.SPECTATOR);
-                    player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    player.setSpectatorTarget(target);
-                    if (player.hasPermission(Permissions.INVENTORY)) {
-                        InventoryHandler.swapInventories(player, target);
-                    }
-                    Spectator.trackedSpectators.add(player);
-                    Spectator.spectatorRelations.put(player, target);
-                    if (Config.hideFromTab) {
-                        Spectator.playerHider.hidePlayer(player);
-                    }
+                    Spectator.playerHandler.spectatePlayer(player, target);
                     sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));
                 }
                 else {
@@ -50,37 +38,15 @@ public class SpectateCommand implements CommandExecutor {
             }
             else {
                 if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-                    player.setGameMode(GameMode.SPECTATOR);
-                    Spectator.trackedSpectators.add(player);
-                    if (Config.hideFromTab) {
-                        Spectator.playerHider.hidePlayer(player);
-                    }
+                    Spectator.playerHandler.spectatePlayer(player, null);
                     sender.sendMessage(Messages.translate("Messages.Spectate.General"));
-                    return true;
                 }
-            }
-            if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-                // Check if the location is safe.
-                Location location = player.getLocation();
-                float pitch = location.getPitch();
-                float yaw = location.getYaw();
-                if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
-                    location = location.getWorld().getHighestBlockAt(location).getLocation();
-                    location.setPitch(pitch);
-                    location.setYaw(yaw);
+                else {
+                    Spectator.playerHandler.unspectatePlayer(player);
+                    sender.sendMessage(Messages.translate("Messages.Spectate.Off"));
                 }
-                player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                return true;
             }
-            Spectator.trackedSpectators.remove(player);
-            Spectator.spectatorRelations.remove(player);
-            player.setGameMode(GameMode.SURVIVAL);
-            if (player.hasPermission(Permissions.INVENTORY)) {
-                InventoryHandler.restoreInventory(player);
-            }
-            if (Config.hideFromTab) {
-                Spectator.playerHider.showPlayer(player);
-            }
-            sender.sendMessage(Messages.translate("Messages.Spectate.Off"));
         }
         else {
             sender.sendMessage(Messages.translate("Messages.Player.NotPlayer"));
