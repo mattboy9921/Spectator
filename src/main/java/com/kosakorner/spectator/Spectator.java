@@ -1,9 +1,11 @@
 package com.kosakorner.spectator;
 
 import com.kosakorner.spectator.command.SpectateCommand;
+import com.kosakorner.spectator.command.SpectateCycleCommand;
 import com.kosakorner.spectator.command.SpectateReloadCommand;
 import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
+import com.kosakorner.spectator.handler.CycleHandler;
 import com.kosakorner.spectator.handler.InventoryHandler;
 import com.kosakorner.spectator.handler.PacketHandler;
 import com.kosakorner.spectator.handler.PlayerHandler;
@@ -24,6 +26,7 @@ public class Spectator extends JavaPlugin {
 
     public static PlayerHandler playerHandler;
     public static PacketHandler packetHandler;
+    public static CycleHandler cycleHandler;
 
     public static final Set<Player> trackedSpectators = new HashSet<>();
     public static final Map<Player, Player> spectatorRelations = new HashMap<>();
@@ -33,7 +36,10 @@ public class Spectator extends JavaPlugin {
         instance = this;
 
         if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-            log("&4ProtocolLib is not enabled, shutting down. You must install ProtocolLib for this plugin to work!");
+            log("&c==========================================");
+            log("&cProtocolLib is not enabled, shutting down.");
+            log("&cYou must install ProtocolLib for this plugin to work!");
+            log("&c==========================================");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -44,11 +50,14 @@ public class Spectator extends JavaPlugin {
 
         PluginCommand command = getCommand("spectate");
         command.setExecutor(new SpectateCommand());
+        command = getCommand("spectatecycle");
+        command.setExecutor(new SpectateCycleCommand());
         command = getCommand("spectatereload");
         command.setExecutor(new SpectateReloadCommand());
 
         playerHandler = new PlayerHandler(this);
         packetHandler = new PacketHandler(this);
+        cycleHandler = new CycleHandler();
         Bukkit.getPluginManager().registerEvents(playerHandler, this);
     }
 

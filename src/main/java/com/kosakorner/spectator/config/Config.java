@@ -11,6 +11,7 @@ public class Config {
 
     public static boolean mirrorInventory;
     public static boolean hideFromTab;
+    public static boolean cycleOnPlayerDeath;
 
     public static void loadConfig() {
         File configFile = new File(Spectator.instance.getDataFolder(), "config.yml");
@@ -23,6 +24,7 @@ public class Config {
             config = YamlConfiguration.loadConfiguration(configFile);
             config.set("Spectator.MirrorInventory", mirrorInventory = config.getBoolean("Spectator.MirrorInventory", true));
             config.set("Spectator.HideFromTab", hideFromTab = config.getBoolean("Spectator.HideFromTab", false));
+            config.set("Spectator.CycleOnPlayerDeath", cycleOnPlayerDeath = config.getBoolean("Spectator.CycleOnPlayerDeath", false));
             config.save(configFile);
         }
         catch (IOException e) {

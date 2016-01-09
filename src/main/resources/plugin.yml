@@ -1,5 +1,5 @@
 name: Spectator
-version: 1.1.3
+version: 1.2
 author: kosakriszi
 main: com.kosakorner.spectator.Spectator
 softdepend: [ProtocolLib]
@@ -9,9 +9,14 @@ commands:
     aliases: [spec]
     description: Access to spectate.
     permission: spectator.use.spectate
+  spectatecycle:
+    aliases: [speccycle]
+    description: Cycle through all online players.
+    permission: spectator.use.cycle
+    usage: 'Usage: /<command> <start|stop> ...]'
   spectatereload:
     aliases: [specreload]
-    description: Reload the plugin's configs.
+    description: Reload plugin configs.
     permission: spectator.reload
 
 permissions:
@@ -24,6 +29,7 @@ permissions:
           spectator.use.spectate: true
           spectator.use.teleport: true
           spectator.use.inventory: true
+          spectator.use.cycle: true
       spectator.bypass.*:
         description: Bypass certain Spectator features.
         children:

@@ -12,11 +12,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
@@ -84,18 +83,57 @@ public class PlayerHandler implements Listener {
     }
 
     @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        if (Config.cycleOnPlayerDeath) {
+            Player player = event.getEntity();
+            for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+                if (entry.getValue().equals(player)) {
+                    Player spectator = entry.getKey();
+                    if (Spectator.cycleHandler.isPlayerCycling(spectator)) {
+                        Spectator.cycleHandler.restartCycle(spectator);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
     @SuppressWarnings("deprecation")
     public void onPlayerDismount(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
+        // Only capture the button down event
+        if (event.isSneaking()) {
+            dismountTarget(player);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                dismountTarget(entry.getKey());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        Player player = event.getPlayer();
+        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                dismountTarget(entry.getKey());
+            }
+        }
+    }
+
+    public void dismountTarget(Player player) {
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
-            // Only capture the button down event
-            if (event.isSneaking()) {
-                if (player.getSpectatorTarget() != null && player.getSpectatorTarget().getType().equals(EntityType.PLAYER)) {
-                    if (player.hasPermission(Permissions.INVENTORY)) {
-                        InventoryHandler.restoreInventory(player);
-                    }
-                    Spectator.spectatorRelations.remove(player);
+            if (player.getSpectatorTarget() != null && player.getSpectatorTarget().getType().equals(EntityType.PLAYER)) {
+                if (player.hasPermission(Permissions.INVENTORY)) {
+                    InventoryHandler.restoreInventory(player);
                 }
+                Spectator.spectatorRelations.remove(player);
             }
         }
     }
@@ -120,16 +158,11 @@ public class PlayerHandler implements Listener {
     }
 
     private void resendInventoryToSpectators(final Player player) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-                    if (entry.getValue().equals(player)) {
-                        InventoryHandler.resendInventoy(player, entry.getKey());
-                    }
-                }
+        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                InventoryHandler.resendInventoy(player, entry.getKey());
             }
-        });
+        }
     }
 
 }
