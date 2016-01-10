@@ -1,5 +1,5 @@
 group 'com.kosakorner'
-version '1.2'
+version '1.2.1'
 
 apply plugin: 'java'
 

@@ -28,6 +28,9 @@ public class SpectateCommand implements CommandExecutor {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoChange", "player", target.getName()));
                         return true;
                     }
+                    if (Spectator.spectatorRelations.get(target) == player || target.hasPermission(Permissions.BYPASS_VIEWABLE)) {
+                        sender.sendMessage(Messages.translate("Messages.Spectate.NoSpectate", "player", target.getName()));
+                    }
                     Spectator.playerHandler.spectatePlayer(player, target);
                     sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));
                 }
@@ -43,6 +46,9 @@ public class SpectateCommand implements CommandExecutor {
                 }
                 else {
                     Spectator.playerHandler.unspectatePlayer(player);
+                    if (Spectator.cycleHandler.isPlayerCycling(player)) {
+                        Spectator.cycleHandler.stopCycle(player);
+                    }
                     sender.sendMessage(Messages.translate("Messages.Spectate.Off"));
                 }
                 return true;

@@ -40,6 +40,7 @@ public class Messages {
             messages.set("Messages.Spectate.CycleNoDismount", messages.getString("Messages.Spectate.CycleNoDismount", "&cPlayer dismount blocked, you are currently cycling! Use &7/speccycle stop &cto stop!"));
             messages.set("Messages.Spectate.Self", messages.getString("Messages.Spectate.Self", "&cYou can't spectate yourself!"));
             messages.set("Messages.Spectate.NoChange", messages.getString("Messages.Spectate.NoChange", "&cYou are already spectating <player>!"));
+            messages.set("Messages.Spectate.NoSpectate", messages.getString("Messages.Spectate.NoSpectate", "&c<player> cannot be spectated at this time!"));
             messages.set("Messages.Player.NotPlayer", messages.getString("Messages.Player.NotPlayer", "&cYou must be a player to run this command!"));
             messages.set("Messages.Player.Offline", messages.getString("Messages.Player.Offline", "&c<player> isn't online!"));
             messages.set("Messages.Player.GameModeBlocked", messages.getString("Messages.Player.GameModeBlocked", "&cGamemode change blocked, you are currently spectating. Use &7/spec &cto leave spectator mode!"));

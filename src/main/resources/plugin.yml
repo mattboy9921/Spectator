@@ -1,5 +1,5 @@
 name: Spectator
-version: 1.2
+version: 1.2.1
 author: kosakriszi
 main: com.kosakorner.spectator.Spectator
 softdepend: [ProtocolLib]
@@ -34,5 +34,6 @@ permissions:
         description: Bypass certain Spectator features.
         children:
           spectator.bypass.tablist: true
+          spectator.bypass.viewable: true
       spectator.reload:
         description: Access to reload all Spectator configs.

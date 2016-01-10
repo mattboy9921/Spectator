@@ -1,6 +1,7 @@
 package com.kosakorner.spectator.cycle;
 
 import com.kosakorner.spectator.Spectator;
+import com.kosakorner.spectator.config.Permissions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -49,6 +50,11 @@ public class Cycle {
 
     private void updateLists() {
         toVisit = new ArrayList<>(Bukkit.getOnlinePlayers());
+        for (Player player : toVisit) {
+            if (player.hasPermission(Permissions.BYPASS_VIEWABLE)) {
+                toVisit.remove(player);
+            }
+        }
         // Clear the toVisit list of players that have been visited.
         for (Player player : alreadyVisited) {
             if (!player.isOnline()) {
