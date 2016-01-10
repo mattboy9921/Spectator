@@ -13,7 +13,7 @@ commands:
     aliases: [speccycle]
     description: Cycle through all online players.
     permission: spectator.use.cycle
-    usage: 'Usage: /<command> <start|stop> ...]'
+    usage: '§cUsage: /<command> <start|stop> ...'
   spectatereload:
     aliases: [specreload]
     description: Reload plugin configs.

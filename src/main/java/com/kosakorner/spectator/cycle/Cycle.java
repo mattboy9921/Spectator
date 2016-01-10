@@ -1,5 +1,6 @@
 package com.kosakorner.spectator.cycle;
 
+import com.kosakorner.spectator.Spectator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -41,6 +42,9 @@ public class Cycle {
             toVisit.remove(player);
         }
         toVisit.remove(owner);
+        for (Player player : Spectator.trackedSpectators) {
+            toVisit.remove(player);
+        }
     }
 
 }

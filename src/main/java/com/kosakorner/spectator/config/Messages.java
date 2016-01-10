@@ -16,7 +16,7 @@ public class Messages {
         String message = messages.getString(key, key);
         for (int i = 0; i < replaceList.length; i++) {
             String target = (String) replaceList[i];
-            String toInsert = (String) replaceList[i += 1];
+            String toInsert = replaceList[i += 1].toString();
             message = message.replace("<" + target + ">", toInsert);
         }
         return ChatColor.translateAlternateColorCodes('&', message);
@@ -37,10 +37,10 @@ public class Messages {
             messages.set("Messages.Spectate.CycleStop", messages.getString("Messages.Spectate.CycleStop", "&eSpectating cycle stopped!"));
             messages.set("Messages.Spectate.Self", messages.getString("Messages.Spectate.Self", "&cYou can't spectate yourself!"));
             messages.set("Messages.Spectate.NoChange", messages.getString("Messages.Spectate.NoChange", "&cYou are already spectating <player>!"));
-            messages.set("Messages.Spectate.CycleDisabled", messages.getString("Messages.Spectate.CycleDisabled", "&cCycles are not enabled!"));
+            messages.set("Messages.Spectate.CycleNoDismount", messages.getString("Messages.Spectate.CycleNoDismount", "&cPlayer dismount blocked, you are currently cycling! Use &7/speccycle stop &cto stop!"));
             messages.set("Messages.Player.NotPlayer", messages.getString("Messages.Player.NotPlayer", "&cYou must be a player to run this command!"));
             messages.set("Messages.Player.Offline", messages.getString("Messages.Player.Offline", "&c<player> isn't online!"));
-            messages.set("Messages.Player.GameModeBlocked", messages.getString("Messages.Player.GameModeBlocked", "&cGamemode change blocked, you are currently spectating. Use /spec to leave spectator mode!"));
+            messages.set("Messages.Player.GameModeBlocked", messages.getString("Messages.Player.GameModeBlocked", "&cGamemode change blocked, you are currently spectating. Use &7/spec &cto leave spectator mode!"));
             messages.set("Messages.Plugin.Reload", messages.getString("Messages.Plugin.Reload", "&bReloaded Spectator configs successfully!"));
             messages.save(messagesFile);
         }

@@ -19,7 +19,7 @@ public class SpectateCycleCommand implements CommandExecutor {
                     case "start":
                         if (args.length == 2) {
                             try {
-                                int interval = Integer.parseInt(args[0]);
+                                int interval = Integer.parseInt(args[1]);
                                 Spectator.cycleHandler.startCycle(player, interval * 20);
                                 sender.sendMessage(Messages.translate("Messages.Spectate.CycleStart", "interval", interval));
                                 return true;

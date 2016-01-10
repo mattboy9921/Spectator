@@ -101,9 +101,15 @@ public class PlayerHandler implements Listener {
     @SuppressWarnings("deprecation")
     public void onPlayerDismount(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
-        // Only capture the button down event
-        if (event.isSneaking()) {
-            dismountTarget(player);
+        if (!Spectator.cycleHandler.isPlayerCycling(player)) {
+            // Only capture the button down event
+            if (event.isSneaking()) {
+                dismountTarget(player);
+            }
+        }
+        else {
+            player.sendMessage(Messages.translate("Messages.Spectate.CycleNoDismount"));
+            event.setCancelled(true);
         }
     }
 
