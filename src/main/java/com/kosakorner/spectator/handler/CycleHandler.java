@@ -19,13 +19,14 @@ public class CycleHandler {
     }
 
     public void startCycle(final Player player, int ticks) {
-        playerCycles.put(player, new Cycle(player));
+        playerCycles.put(player, new Cycle(player, null));
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(Spectator.instance, new Runnable() {
             @Override
             public void run() {
                 Cycle cycle = playerCycles.get(player);
                 if (!cycle.hasNextPlayer()) {
-                    cycle = new Cycle(player);
+                    Player last = cycle.getLastPlayer();
+                    cycle = new Cycle(player, last);
                     playerCycles.remove(player);
                     playerCycles.put(player, cycle);
                 }

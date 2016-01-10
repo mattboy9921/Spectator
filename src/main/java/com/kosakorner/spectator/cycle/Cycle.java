@@ -11,29 +11,44 @@ import java.util.Random;
 public class Cycle {
 
     private Player owner;
+    private Player last;
     private List<Player> alreadyVisited = new ArrayList<>();
     private List<Player> toVisit = new ArrayList<>();
 
     private Random random = new Random();
 
-    public Cycle(Player owner) {
+    public Cycle(Player owner, Player last) {
         this.owner = owner;
+        this.last = last;
     }
 
     public boolean hasNextPlayer() {
         return alreadyVisited.size() != toVisit.size();
     }
 
+    public Player getLastPlayer() {
+        return last;
+    }
+
     public Player getNextPlayer() {
         updateLists();
+        if (toVisit.size() == 0) {
+            return owner;
+        }
+        if (toVisit.size() == 1) {
+            return toVisit.get(0);
+        }
         Player player = toVisit.get(random.nextInt(toVisit.size()));
+        if (player.equals(last)) {
+            return getNextPlayer();
+        }
+        last = player;
         alreadyVisited.add(player);
         return player;
     }
 
     private void updateLists() {
         toVisit = new ArrayList<>(Bukkit.getOnlinePlayers());
-
         // Clear the toVisit list of players that have been visited.
         for (Player player : alreadyVisited) {
             if (!player.isOnline()) {

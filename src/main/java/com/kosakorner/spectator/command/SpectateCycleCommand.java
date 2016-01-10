@@ -44,7 +44,7 @@ public class SpectateCycleCommand implements CommandExecutor {
                             sender.sendMessage(Messages.translate("Messages.Spectate.CycleStop"));
                         }
                         else {
-
+                            sender.sendMessage(Messages.translate("Messages.Spectate.CycleInactive"));
                         }
                         return true;
                 }
