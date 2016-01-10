@@ -142,6 +142,7 @@ public class PlayerHandler implements Listener {
                     InventoryHandler.restoreInventory(player);
                 }
                 Spectator.spectatorRelations.remove(player);
+                player.setSpectatorTarget(player);
             }
         }
     }

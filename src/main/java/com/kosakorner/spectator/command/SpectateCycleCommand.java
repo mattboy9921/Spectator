@@ -39,8 +39,13 @@ public class SpectateCycleCommand implements CommandExecutor {
                             return true;
                         }
                     case "stop":
-                        Spectator.cycleHandler.stopCycle(player);
-                        sender.sendMessage(Messages.translate("Messages.Spectate.CycleStop"));
+                        if (Spectator.cycleHandler.isPlayerCycling(player)) {
+                            Spectator.cycleHandler.stopCycle(player);
+                            sender.sendMessage(Messages.translate("Messages.Spectate.CycleStop"));
+                        }
+                        else {
+
+                        }
                         return true;
                 }
             }
