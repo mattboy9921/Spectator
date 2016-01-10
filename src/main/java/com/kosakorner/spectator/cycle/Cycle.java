@@ -33,7 +33,7 @@ public class Cycle {
     public Player getNextPlayer() {
         updateLists();
         if (toVisit.size() == 0) {
-            return owner;
+            return null;
         }
         if (toVisit.size() == 1) {
             return toVisit.get(0);

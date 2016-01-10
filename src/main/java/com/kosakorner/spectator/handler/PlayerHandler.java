@@ -23,11 +23,8 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class PlayerHandler implements Listener {
 
-    private Plugin plugin;
-
     public PlayerHandler(Plugin plugin) {
-        this.plugin = plugin;
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new Runnable() {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
             public void run() {
                 for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
@@ -117,20 +114,25 @@ public class PlayerHandler implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-            if (entry.getValue().equals(player)) {
-                dismountTarget(entry.getKey());
-            }
-        }
+        onPlayerLogout(event);
     }
 
     @EventHandler
     public void onPlayerKick(PlayerKickEvent event) {
+        onPlayerLogout(event);
+    }
+
+    private void onPlayerLogout(PlayerEvent event) {
         Player player = event.getPlayer();
         for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
             if (entry.getValue().equals(player)) {
-                dismountTarget(entry.getKey());
+                Player spectator = entry.getKey();
+                if (!Spectator.cycleHandler.isPlayerCycling(spectator)) {
+                    dismountTarget(spectator);
+                }
+                else {
+                    Spectator.cycleHandler.restartCycle(spectator);
+                }
             }
         }
     }

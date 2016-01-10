@@ -41,7 +41,7 @@ public class SpectateCycleCommand implements CommandExecutor {
                     case "stop":
                         if (Spectator.cycleHandler.isPlayerCycling(player)) {
                             Spectator.cycleHandler.stopCycle(player);
-                            sender.sendMessage(Messages.translate("Messages.Spectate.CycleStop"));
+                            // The stop message is sent in the stopCycle() method.
                         }
                         else {
                             sender.sendMessage(Messages.translate("Messages.Spectate.CycleInactive"));
