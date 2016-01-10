@@ -108,7 +108,9 @@ public class PlayerHandler implements Listener {
             }
         }
         else {
-            player.sendMessage(Messages.translate("Messages.Spectate.CycleNoDismount"));
+            if (event.isSneaking()) {
+                player.sendMessage(Messages.translate("Messages.Spectate.CycleNoDismount"));
+            }
             event.setCancelled(true);
         }
     }

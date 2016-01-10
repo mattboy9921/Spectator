@@ -24,7 +24,7 @@ public class CycleHandler {
             @Override
             public void run() {
                 Cycle cycle = playerCycles.get(player);
-                if (cycle.hasNextPlayer()) {
+                if (!cycle.hasNextPlayer()) {
                     cycle = new Cycle(player);
                     playerCycles.remove(player);
                     playerCycles.put(player, cycle);

@@ -27,7 +27,7 @@ public class Cycle {
     public Player getNextPlayer() {
         updateLists();
         Player player = toVisit.get(random.nextInt(toVisit.size()));
-        alreadyVisited.remove(player);
+        alreadyVisited.add(player);
         return player;
     }
 

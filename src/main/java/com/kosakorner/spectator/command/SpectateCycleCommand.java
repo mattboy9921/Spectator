@@ -18,14 +18,20 @@ public class SpectateCycleCommand implements CommandExecutor {
                 switch (args[0]) {
                     case "start":
                         if (args.length == 2) {
-                            try {
-                                int interval = Integer.parseInt(args[1]);
-                                Spectator.cycleHandler.startCycle(player, interval * 20);
-                                sender.sendMessage(Messages.translate("Messages.Spectate.CycleStart", "interval", interval));
-                                return true;
+                            if (!Spectator.cycleHandler.isPlayerCycling(player)) {
+                                try {
+                                    int interval = Integer.parseInt(args[1]);
+                                    Spectator.cycleHandler.startCycle(player, interval * 20);
+                                    sender.sendMessage(Messages.translate("Messages.Spectate.CycleStart", "interval", interval));
+                                    return true;
+                                }
+                                catch (NumberFormatException e) {
+                                    return false;
+                                }
                             }
-                            catch (NumberFormatException e) {
-                                return false;
+                            else {
+                                sender.sendMessage(Messages.translate("Messages.Spectate.CycleRunning"));
+                                return true;
                             }
                         }
                         else {
