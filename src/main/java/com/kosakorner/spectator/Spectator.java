@@ -44,7 +44,9 @@ public class Spectator extends JavaPlugin {
             return;
         }
 
-        getDataFolder().mkdir();
+        if (getDataFolder().mkdir()) {
+            log("Creating plugin folder!");
+        }
         Config.loadConfig();
         Messages.loadMessages();
 

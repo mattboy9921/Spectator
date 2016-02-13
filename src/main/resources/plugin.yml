@@ -21,7 +21,7 @@ commands:
 
 permissions:
   spectator.*:
-    description: Grant all Spectator permissions
+    description: Grant all Spectator permissions.
     children:
       spectator.use.*:
         description: Access to all Spectator commands.

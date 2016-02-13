@@ -30,6 +30,7 @@ public class SpectateCommand implements CommandExecutor {
                     }
                     if (Spectator.spectatorRelations.get(target) == player || target.hasPermission(Permissions.BYPASS_VIEWABLE)) {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoSpectate", "player", target.getName()));
+                        return true;
                     }
                     Spectator.playerHandler.spectatePlayer(player, target);
                     sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));

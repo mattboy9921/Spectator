@@ -1,5 +1,7 @@
 package com.kosakorner.spectator.handler;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.kosakorner.spectator.Spectator;
 import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
@@ -23,20 +25,36 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class PlayerHandler implements Listener {
 
+    private final BiMap<Player, Location> lastLocationCache;
+
     public PlayerHandler(Plugin plugin) {
+        lastLocationCache = HashBiMap.create();
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
             public void run() {
                 for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-                    entry.getKey().teleport(entry.getValue(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    entry.getKey().setSpectatorTarget(entry.getKey());
-                    entry.getKey().setSpectatorTarget(entry.getValue());
+                    Player player = entry.getKey();
+                    Player target = entry.getValue();
+                    if (!player.getLocation().equals(target.getLocation())) {
+                        player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        player.setSpectatorTarget(null);
+                        player.setSpectatorTarget(target);
+                    }
                 }
             }
         }, 0, 20);
     }
 
+    public Location getLastLocation(Player player) {
+        return lastLocationCache.get(player);
+    }
+
+    public void updateLastLocation(Player player) {
+        lastLocationCache.forcePut(player, player.getLocation());
+    }
+
     public void spectatePlayer(Player player, Player target) {
+        updateLastLocation(player);
         player.setGameMode(GameMode.SPECTATOR);
         if (!Spectator.trackedSpectators.contains(player)) {
             Spectator.trackedSpectators.add(player);
@@ -59,13 +77,19 @@ public class PlayerHandler implements Listener {
     @SuppressWarnings("deprecation")
     public void unspectatePlayer(Player player) {
         // Check if the location is safe.
-        Location location = player.getLocation();
-        float pitch = location.getPitch();
-        float yaw = location.getYaw();
-        if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
-            location = location.getWorld().getHighestBlockAt(location).getLocation();
-            location.setPitch(pitch);
-            location.setYaw(yaw);
+        Location location;
+        if (Config.rememberSurvivalPosition) {
+            location = getLastLocation(player);
+        }
+        else {
+            location = player.getLocation();
+            float pitch = location.getPitch();
+            float yaw = location.getYaw();
+            if (!location.getBlock().getType().equals(Material.AIR) || !player.isOnGround()) {
+                location = location.getWorld().getHighestBlockAt(location).getLocation();
+                location.setPitch(pitch);
+                location.setYaw(yaw);
+            }
         }
         player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
         Spectator.trackedSpectators.remove(player);
@@ -114,15 +138,6 @@ public class PlayerHandler implements Listener {
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        onPlayerLogout(event);
-    }
-
-    @EventHandler
-    public void onPlayerKick(PlayerKickEvent event) {
-        onPlayerLogout(event);
-    }
-
-    private void onPlayerLogout(PlayerEvent event) {
         Player player = event.getPlayer();
         for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
             if (entry.getValue().equals(player)) {
