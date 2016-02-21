@@ -70,8 +70,10 @@ public class PacketHandler {
             infoData.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(player), getPlayerPing(player), EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode()), WrappedChatComponent.fromText(player.getPlayerListName())));
             packet.getPlayerInfoDataLists().write(0, infoData);
             for (Player target : Bukkit.getOnlinePlayers()) {
-                if (!Spectator.hasPermission(target, Permissions.BYPASS_TABLIST)) {
-                    protocolManager.sendServerPacket(target, packet);
+                if (!target.getUniqueId().equals(player.getUniqueId())) {
+                    if (!Spectator.hasPermission(target, Permissions.BYPASS_TABLIST)) {
+                        protocolManager.sendServerPacket(target, packet);
+                    }
                 }
             }
         }

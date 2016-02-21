@@ -37,9 +37,9 @@ public class PlayerHandler implements Listener {
                     Player target = entry.getValue();
                     if (!player.getLocation().equals(target.getLocation())) {
                         player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
-                        player.setSpectatorTarget(null);
-                        player.setSpectatorTarget(target);
                     }
+                    player.setSpectatorTarget(null);
+                    player.setSpectatorTarget(target);
                 }
             }
         }, 0, 20);
@@ -53,35 +53,37 @@ public class PlayerHandler implements Listener {
         lastLocationCache.forcePut(player, player.getLocation());
     }
 
-    public void spectatePlayer(Player player, Player target) {
-        updateLastLocation(player);
+    public void spectatePlayer(final Player player, final Player target) {
+        if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
+            updateLastLocation(player);
+        }
         player.setGameMode(GameMode.SPECTATOR);
         if (!Spectator.trackedSpectators.contains(player)) {
             Spectator.trackedSpectators.add(player);
         }
+        if (Config.hideFromTab) {
+            Spectator.packetHandler.hidePlayer(player);
+        }
         if (target != null) {
-            player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            player.setSpectatorTarget(target);
             if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
                 InventoryHandler.restoreInventory(player);
                 InventoryHandler.swapInventories(player, target);
             }
             Spectator.spectatorRelations.remove(player);
             Spectator.spectatorRelations.put(player, target);
-        }
-        if (Config.hideFromTab) {
-            Spectator.packetHandler.hidePlayer(player);
+            player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            player.setSpectatorTarget(target);
         }
     }
 
     @SuppressWarnings("deprecation")
-    public void unspectatePlayer(Player player) {
+    public void unspectatePlayer(final Player player) {
         // Check if the location is safe.
-        Location location;
+        Location location = null;
         if (Config.rememberSurvivalPosition) {
             location = getLastLocation(player);
         }
-        else {
+        if (location == null) {
             location = player.getLocation();
             float pitch = location.getPitch();
             float yaw = location.getYaw();
@@ -94,13 +96,13 @@ public class PlayerHandler implements Listener {
         player.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN);
         Spectator.trackedSpectators.remove(player);
         Spectator.spectatorRelations.remove(player);
-        player.setGameMode(GameMode.SURVIVAL);
         if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
             InventoryHandler.restoreInventory(player);
         }
         if (Config.hideFromTab) {
             Spectator.packetHandler.showPlayer(player);
         }
+        player.setGameMode(GameMode.SURVIVAL);
     }
 
     @EventHandler
@@ -188,6 +190,12 @@ public class PlayerHandler implements Listener {
             if (entry.getValue().equals(player)) {
                 InventoryHandler.resendInventoy(player, entry.getKey());
             }
+        }
+    }
+
+    public void restoreAllSpectators() {
+        for (Player player : Spectator.trackedSpectators) {
+            unspectatePlayer(player);
         }
     }
 

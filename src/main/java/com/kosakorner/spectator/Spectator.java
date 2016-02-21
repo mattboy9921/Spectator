@@ -68,6 +68,7 @@ public class Spectator extends JavaPlugin {
     @Override
     public void onDisable() {
         InventoryHandler.restoreAllInventories();
+        playerHandler.restoreAllSpectators();
     }
 
     public static boolean hasPermission(CommandSender sender, String node) {
