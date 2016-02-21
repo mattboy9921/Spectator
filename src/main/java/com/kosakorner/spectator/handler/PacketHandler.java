@@ -41,7 +41,7 @@ public class PacketHandler {
                                 Entity entity = event.getPacket().getEntityModifier(player.getWorld()).read(0);
                                 if (entity.getType().equals(EntityType.PLAYER)) {
                                     Player target = (Player) entity;
-                                    if (player.hasPermission(Permissions.INVENTORY)) {
+                                    if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
                                         InventoryHandler.swapInventories(player, target);
                                     }
                                     Spectator.spectatorRelations.put(player, target);
@@ -70,7 +70,7 @@ public class PacketHandler {
             infoData.add(new PlayerInfoData(WrappedGameProfile.fromPlayer(player), getPlayerPing(player), EnumWrappers.NativeGameMode.fromBukkit(player.getGameMode()), WrappedChatComponent.fromText(player.getPlayerListName())));
             packet.getPlayerInfoDataLists().write(0, infoData);
             for (Player target : Bukkit.getOnlinePlayers()) {
-                if (!target.hasPermission(Permissions.BYPASS_TABLIST)) {
+                if (!Spectator.hasPermission(target, Permissions.BYPASS_TABLIST)) {
                     protocolManager.sendServerPacket(target, packet);
                 }
             }

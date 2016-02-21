@@ -62,7 +62,7 @@ public class PlayerHandler implements Listener {
         if (target != null) {
             player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
             player.setSpectatorTarget(target);
-            if (player.hasPermission(Permissions.INVENTORY)) {
+            if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
                 InventoryHandler.restoreInventory(player);
                 InventoryHandler.swapInventories(player, target);
             }
@@ -95,7 +95,7 @@ public class PlayerHandler implements Listener {
         Spectator.trackedSpectators.remove(player);
         Spectator.spectatorRelations.remove(player);
         player.setGameMode(GameMode.SURVIVAL);
-        if (player.hasPermission(Permissions.INVENTORY)) {
+        if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
             InventoryHandler.restoreInventory(player);
         }
         if (Config.hideFromTab) {
@@ -155,7 +155,7 @@ public class PlayerHandler implements Listener {
     public void dismountTarget(Player player) {
         if (player.getGameMode().equals(GameMode.SPECTATOR)) {
             if (player.getSpectatorTarget() != null && player.getSpectatorTarget().getType().equals(EntityType.PLAYER)) {
-                if (player.hasPermission(Permissions.INVENTORY)) {
+                if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
                     InventoryHandler.restoreInventory(player);
                 }
                 Spectator.spectatorRelations.remove(player);

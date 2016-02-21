@@ -5,12 +5,14 @@ import com.kosakorner.spectator.command.SpectateCycleCommand;
 import com.kosakorner.spectator.command.SpectateReloadCommand;
 import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
+import com.kosakorner.spectator.config.Permissions;
 import com.kosakorner.spectator.handler.CycleHandler;
 import com.kosakorner.spectator.handler.InventoryHandler;
 import com.kosakorner.spectator.handler.PacketHandler;
 import com.kosakorner.spectator.handler.PlayerHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -66,6 +68,24 @@ public class Spectator extends JavaPlugin {
     @Override
     public void onDisable() {
         InventoryHandler.restoreAllInventories();
+    }
+
+    public static boolean hasPermission(CommandSender sender, String node) {
+        if (sender.hasPermission(Permissions.ALL)) {
+            return true;
+        }
+        if (sender.hasPermission(node)) {
+            return true;
+        }
+        else {
+            if (node.contains("use")) {
+                return sender.hasPermission(Permissions.USE_ALL);
+            }
+            if (node.contains("bypass")) {
+                return sender.hasPermission(Permissions.BYPASS_ALL);
+            }
+        }
+        return false;
     }
 
     public static void log(String message) {

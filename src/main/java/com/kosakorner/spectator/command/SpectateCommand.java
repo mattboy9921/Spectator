@@ -17,7 +17,7 @@ public class SpectateCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length > 0 && sender.hasPermission(Permissions.TELEPORT)) {
+            if (args.length > 0 && Spectator.hasPermission(sender, Permissions.TELEPORT)) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
                     if (target.getUniqueId().equals(player.getUniqueId())) {
@@ -28,7 +28,7 @@ public class SpectateCommand implements CommandExecutor {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoChange", "player", target.getName()));
                         return true;
                     }
-                    if (Spectator.spectatorRelations.get(target) == player || target.hasPermission(Permissions.BYPASS_VIEWABLE)) {
+                    if (Spectator.spectatorRelations.get(target) == player || Spectator.hasPermission(target, Permissions.BYPASS_VIEWABLE)) {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoSpectate", "player", target.getName()));
                         return true;
                     }

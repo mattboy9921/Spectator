@@ -52,7 +52,7 @@ public class Cycle {
         List<Player> toRemove = new ArrayList<>();
         toVisit = new ArrayList<>(Bukkit.getOnlinePlayers());
         for (Player player : toVisit) {
-            if (player.hasPermission(Permissions.BYPASS_VIEWABLE)) {
+            if (Spectator.hasPermission(player, Permissions.BYPASS_VIEWABLE)) {
                 toRemove.add(player);
             }
         }
