@@ -177,15 +177,21 @@ public class PlayerHandler implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked().getGameMode().equals(GameMode.SPECTATOR)) {
+            event.setCancelled(true);
+        }
         resendInventoryToSpectators((Player) event.getWhoClicked());
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getWhoClicked().getGameMode().equals(GameMode.SPECTATOR)) {
+            event.setCancelled(true);
+        }
         resendInventoryToSpectators((Player) event.getWhoClicked());
     }
 
-    private void resendInventoryToSpectators(final Player player) {
+    private void resendInventoryToSpectators(Player player) {
         for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
             if (entry.getValue().equals(player)) {
                 InventoryHandler.resendInventoy(player, entry.getKey());
