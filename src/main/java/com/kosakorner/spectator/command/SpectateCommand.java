@@ -4,6 +4,7 @@ import com.kosakorner.spectator.Spectator;
 import com.kosakorner.spectator.config.Messages;
 import com.kosakorner.spectator.config.Permissions;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -17,7 +18,7 @@ public class SpectateCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (args.length > 0 && Spectator.hasPermission(sender, Permissions.TELEPORT)) {
+            if (args.length == 1 && Spectator.hasPermission(sender, Permissions.TELEPORT)) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
                     if (target.getUniqueId().equals(player.getUniqueId())) {
@@ -56,7 +57,19 @@ public class SpectateCommand implements CommandExecutor {
             }
         }
         else {
-            sender.sendMessage(Messages.translate("Messages.Player.NotPlayer"));
+            if (args.length == 1) {
+                Player target = Bukkit.getPlayer(args[0]);
+                if (target != null) {
+                    Spectator.playerHandler.spectatePlayer(target, null);
+                    sender.sendMessage(Messages.translate("Messages.Spectate.GiveOther", "player", target.getName()));
+                }
+                else {
+                    sender.sendMessage(Messages.translate("Messages.Player.Offline", "player", args[0]));
+                }
+            }
+            else {
+                sender.sendMessage(ChatColor.RED + "Usage: /spectate <player>");
+            }
         }
         return true;
     }

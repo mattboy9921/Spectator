@@ -32,6 +32,7 @@ public class Messages {
             messages = YamlConfiguration.loadConfiguration(messagesFile);
             messages.set("Messages.Spectate.General", messages.getString("Messages.Spectate.General", "&bYour are now spectating!"));
             messages.set("Messages.Spectate.Other", messages.getString("Messages.Spectate.Other", "&bYou are now spectating <player>!"));
+            messages.set("Messages.Spectate.GiveOther", messages.getString("Messages.Spectate.GiveOther", "&bPutting <player> into spectator mode!"));
             messages.set("Messages.Spectate.Off", messages.getString("Messages.Spectate.Off", "&eYou are no longer spectating!"));
             messages.set("Messages.Spectate.CycleStart", messages.getString("Messages.Spectate.CycleStart", "&bSpectating cycle started with interval <interval>!"));
             messages.set("Messages.Spectate.CycleStop", messages.getString("Messages.Spectate.CycleStop", "&eSpectating cycle stopped!"));
