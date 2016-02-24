@@ -59,8 +59,8 @@ public class Spectator extends JavaPlugin {
         command = getCommand("spectatereload");
         command.setExecutor(new SpectateReloadCommand());
 
-        playerHandler = new PlayerHandler(this);
-        packetHandler = new PacketHandler(this);
+        playerHandler = new PlayerHandler();
+        packetHandler = new PacketHandler();
         cycleHandler = new CycleHandler();
         Bukkit.getPluginManager().registerEvents(playerHandler, this);
     }

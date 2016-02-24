@@ -18,51 +18,59 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.plugin.Plugin;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 public class PlayerHandler implements Listener {
 
-    private final BiMap<Player, Location> lastLocationCache;
+    private final Set<Player> hiddenPlayers = new HashSet<>();
+    private final BiMap<Player, Location> lastLocationCache = HashBiMap.create();
+    private final BiMap<Player, GameMode> lastGameModeCache = HashBiMap.create();
 
-    public PlayerHandler(Plugin plugin) {
-        lastLocationCache = HashBiMap.create();
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
+    public PlayerHandler() {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(Spectator.instance, new Runnable() {
             @Override
             public void run() {
                 for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-                    Player player = entry.getKey();
-                    Player target = entry.getValue();
-                    if (!player.getLocation().equals(target.getLocation())) {
+                    final Player player = entry.getKey();
+                    final Player target = entry.getValue();
+                    if (!player.getWorld().equals(target.getWorld()) || player.getLocation().distanceSquared(target.getLocation()) > 1) {
+                        player.setSpectatorTarget(null);
                         player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        Bukkit.getScheduler().runTaskLater(Spectator.instance, new Runnable() {
+                            @Override
+                            public void run() {
+                                player.setSpectatorTarget(target);
+                            }
+                        }, 5);
                     }
-                    player.setSpectatorTarget(null);
-                    player.setSpectatorTarget(target);
                 }
             }
         }, 0, 20);
-    }
-
-    public Location getLastLocation(Player player) {
-        return lastLocationCache.get(player);
-    }
-
-    public void updateLastLocation(Player player) {
-        lastLocationCache.forcePut(player, player.getLocation());
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(Spectator.instance, new Runnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+                    InventoryHandler.resendInventoy(entry.getValue(), entry.getKey());
+                }
+            }
+        }, 0, 15);
     }
 
     public void spectatePlayer(final Player player, final Player target) {
         if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-            updateLastLocation(player);
+            lastLocationCache.forcePut(player, player.getLocation());
+            lastGameModeCache.forcePut(player, player.getGameMode());
         }
         player.setGameMode(GameMode.SPECTATOR);
         if (!Spectator.trackedSpectators.contains(player)) {
             Spectator.trackedSpectators.add(player);
         }
         if (Config.hideFromTab) {
-            Spectator.packetHandler.hidePlayer(player);
+            updatePlayerVisibility(player, false);
         }
         if (target != null) {
             if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
@@ -71,8 +79,14 @@ public class PlayerHandler implements Listener {
             }
             Spectator.spectatorRelations.remove(player);
             Spectator.spectatorRelations.put(player, target);
+            player.setSpectatorTarget(null);
             player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
-            player.setSpectatorTarget(target);
+            Bukkit.getScheduler().runTaskLater(Spectator.instance, new Runnable() {
+                @Override
+                public void run() {
+                    player.setSpectatorTarget(target);
+                }
+            }, 5);
         }
     }
 
@@ -81,7 +95,7 @@ public class PlayerHandler implements Listener {
         // Check if the location is safe.
         Location location = null;
         if (Config.rememberSurvivalPosition) {
-            location = getLastLocation(player);
+            location = lastLocationCache.get(player);
         }
         if (location == null) {
             location = player.getLocation();
@@ -100,9 +114,56 @@ public class PlayerHandler implements Listener {
             InventoryHandler.restoreInventory(player);
         }
         if (Config.hideFromTab) {
-            Spectator.packetHandler.showPlayer(player);
+            updatePlayerVisibility(player, true);
         }
-        player.setGameMode(GameMode.SURVIVAL);
+        GameMode gameMode = lastGameModeCache.get(player);
+        player.setGameMode(gameMode);
+    }
+
+    public void updatePlayerVisibility(Player player, boolean show) {
+        for (Player target : Bukkit.getOnlinePlayers()) {
+            if (!target.getUniqueId().equals(player.getUniqueId())) {
+                if (!Spectator.hasPermission(target, Permissions.BYPASS_TABLIST)) {
+                    if (show) {
+                        hiddenPlayers.remove(player);
+                        target.showPlayer(player);
+                    }
+                    else {
+                        hiddenPlayers.add(player);
+                        target.hidePlayer(player);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (!Spectator.hasPermission(player, Permissions.BYPASS_TABLIST)) {
+            for (Player hidden : hiddenPlayers) {
+                player.hidePlayer(hidden);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        hiddenPlayers.remove(player);
+        lastLocationCache.remove(player);
+        lastGameModeCache.remove(player);
+        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
+            if (entry.getValue().equals(player)) {
+                Player spectator = entry.getKey();
+                if (!Spectator.cycleHandler.isPlayerCycling(spectator)) {
+                    dismountTarget(spectator);
+                }
+                else {
+                    Spectator.cycleHandler.restartCycle(spectator);
+                }
+            }
+        }
     }
 
     @EventHandler
@@ -125,7 +186,7 @@ public class PlayerHandler implements Listener {
     public void onPlayerDismount(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
         if (!Spectator.cycleHandler.isPlayerCycling(player)) {
-            // Only capture the button down event
+            // Only capture the button down event.
             if (event.isSneaking()) {
                 dismountTarget(player);
             }
@@ -135,22 +196,6 @@ public class PlayerHandler implements Listener {
                 player.sendMessage(Messages.translate("Messages.Spectate.CycleNoDismount"));
             }
             event.setCancelled(true);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-            if (entry.getValue().equals(player)) {
-                Player spectator = entry.getKey();
-                if (!Spectator.cycleHandler.isPlayerCycling(spectator)) {
-                    dismountTarget(spectator);
-                }
-                else {
-                    Spectator.cycleHandler.restartCycle(spectator);
-                }
-            }
         }
     }
 
@@ -180,22 +225,12 @@ public class PlayerHandler implements Listener {
         if (event.getWhoClicked().getGameMode().equals(GameMode.SPECTATOR)) {
             event.setCancelled(true);
         }
-        resendInventoryToSpectators((Player) event.getWhoClicked());
     }
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         if (event.getWhoClicked().getGameMode().equals(GameMode.SPECTATOR)) {
             event.setCancelled(true);
-        }
-        resendInventoryToSpectators((Player) event.getWhoClicked());
-    }
-
-    private void resendInventoryToSpectators(Player player) {
-        for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-            if (entry.getValue().equals(player)) {
-                InventoryHandler.resendInventoy(player, entry.getKey());
-            }
         }
     }
 

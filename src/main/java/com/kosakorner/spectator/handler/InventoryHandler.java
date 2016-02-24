@@ -14,6 +14,7 @@ public class InventoryHandler {
 
     @SuppressWarnings("deprecation")
     public static void swapInventories(Player player, Player target) {
+        restoreInventory(player);
         inventories.put(player, player.getInventory().getContents());
         armorStacks.put(player, player.getInventory().getArmorContents());
         player.getInventory().clear();
