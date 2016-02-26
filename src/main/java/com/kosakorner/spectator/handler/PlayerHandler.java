@@ -77,14 +77,14 @@ public class PlayerHandler implements Listener {
                 InventoryHandler.restoreInventory(player);
                 InventoryHandler.swapInventories(player, target);
             }
-            Spectator.spectatorRelations.remove(player);
-            Spectator.spectatorRelations.put(player, target);
             player.setSpectatorTarget(null);
             player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
             Bukkit.getScheduler().runTaskLater(Spectator.instance, new Runnable() {
                 @Override
                 public void run() {
                     player.setSpectatorTarget(target);
+                    Spectator.spectatorRelations.remove(player);
+                    Spectator.spectatorRelations.put(player, target);
                 }
             }, 5);
         }
@@ -96,6 +96,7 @@ public class PlayerHandler implements Listener {
         Location location = null;
         if (Config.rememberSurvivalPosition) {
             location = lastLocationCache.get(player);
+            lastLocationCache.remove(player);
         }
         if (location == null) {
             location = player.getLocation();
@@ -117,6 +118,7 @@ public class PlayerHandler implements Listener {
             updatePlayerVisibility(player, true);
         }
         GameMode gameMode = lastGameModeCache.get(player);
+        lastGameModeCache.remove(player);
         player.setGameMode(gameMode);
     }
 
@@ -150,9 +152,9 @@ public class PlayerHandler implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        hiddenPlayers.remove(player);
-        lastLocationCache.remove(player);
-        lastGameModeCache.remove(player);
+        if (Spectator.trackedSpectators.contains(player)) {
+            unspectatePlayer(player);
+        }
         for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
             if (entry.getValue().equals(player)) {
                 Player spectator = entry.getKey();
