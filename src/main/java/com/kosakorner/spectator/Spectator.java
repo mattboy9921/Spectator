@@ -6,10 +6,10 @@ import com.kosakorner.spectator.command.SpectateReloadCommand;
 import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
 import com.kosakorner.spectator.config.Permissions;
-import com.kosakorner.spectator.handler.CycleHandler;
-import com.kosakorner.spectator.handler.InventoryHandler;
-import com.kosakorner.spectator.handler.PacketHandler;
-import com.kosakorner.spectator.handler.PlayerHandler;
+import com.kosakorner.spectator.cycle.CycleHandler;
+import com.kosakorner.spectator.player.InventoryHandler;
+import com.kosakorner.spectator.util.PacketListener;
+import com.kosakorner.spectator.player.PlayerListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -26,8 +26,7 @@ public class Spectator extends JavaPlugin {
 
     public static Spectator instance;
 
-    public static PlayerHandler playerHandler;
-    public static PacketHandler packetHandler;
+    public static PlayerListener playerListener;
     public static CycleHandler cycleHandler;
 
     public static final Set<Player> trackedSpectators = new HashSet<>();
@@ -36,15 +35,6 @@ public class Spectator extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
-        if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-            log("&c==========================================");
-            log("&cProtocolLib is not enabled, shutting down.");
-            log("&cYou must install ProtocolLib for this plugin to work!");
-            log("&c==========================================");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
 
         if (getDataFolder().mkdir()) {
             log("Creating plugin folder!");
@@ -59,16 +49,16 @@ public class Spectator extends JavaPlugin {
         command = getCommand("spectatereload");
         command.setExecutor(new SpectateReloadCommand());
 
-        playerHandler = new PlayerHandler();
-        packetHandler = new PacketHandler();
+        PacketListener.register();
+        playerListener = new PlayerListener();
         cycleHandler = new CycleHandler();
-        Bukkit.getPluginManager().registerEvents(playerHandler, this);
+        Bukkit.getPluginManager().registerEvents(playerListener, this);
     }
 
     @Override
     public void onDisable() {
         InventoryHandler.restoreAllInventories();
-        playerHandler.restoreAllSpectators();
+        playerListener.restoreAllSpectators();
     }
 
     public static boolean hasPermission(CommandSender sender, String node) {

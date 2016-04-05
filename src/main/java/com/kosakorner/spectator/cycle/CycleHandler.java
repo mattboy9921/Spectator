@@ -1,8 +1,7 @@
-package com.kosakorner.spectator.handler;
+package com.kosakorner.spectator.cycle;
 
 import com.kosakorner.spectator.Spectator;
 import com.kosakorner.spectator.config.Messages;
-import com.kosakorner.spectator.cycle.Cycle;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,12 +27,11 @@ public class CycleHandler {
                 if (!cycle.hasNextPlayer()) {
                     Player last = cycle.getLastPlayer();
                     cycle = new Cycle(player, last);
-                    playerCycles.remove(player);
                     playerCycles.put(player, cycle);
                 }
                 Player next = cycle.getNextPlayer();
                 if (next != null) {
-                    Spectator.playerHandler.spectatePlayer(player, next);
+                    Spectator.playerListener.spectatePlayer(player, next);
                 }
                 else {
                     stopCycle(player);
@@ -47,7 +45,7 @@ public class CycleHandler {
         cycleTasks.get(player).getTask().cancel();
         cycleTasks.remove(player);
         playerCycles.remove(player);
-        Spectator.playerHandler.dismountTarget(player);
+        Spectator.playerListener.dismountTarget(player);
         player.sendMessage(Messages.translate("Messages.Spectate.CycleStop"));
     }
 

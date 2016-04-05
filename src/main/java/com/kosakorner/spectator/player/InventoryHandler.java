@@ -1,4 +1,4 @@
-package com.kosakorner.spectator.handler;
+package com.kosakorner.spectator.player;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +12,7 @@ public class InventoryHandler {
     private static final Map<Player, ItemStack[]> inventories = new HashMap<>();
     private static final Map<Player, ItemStack[]> armorStacks = new HashMap<>();
 
-    @SuppressWarnings("deprecation")
-    public static void swapInventories(Player player, Player target) {
+    public static void mirrorInventory(Player player, Player target) {
         restoreInventory(player);
         inventories.put(player, player.getInventory().getContents());
         armorStacks.put(player, player.getInventory().getArmorContents());
@@ -23,15 +22,13 @@ public class InventoryHandler {
         player.updateInventory();
     }
 
-    @SuppressWarnings("deprecation")
-    public static void resendInventoy(Player player, Player target) {
+    public static void resendInventory(Player player, Player target) {
         target.getInventory().clear();
         target.getInventory().setContents(player.getInventory().getContents());
         target.getInventory().setArmorContents(player.getInventory().getArmorContents());
         target.updateInventory();
     }
 
-    @SuppressWarnings("deprecation")
     public static void restoreInventory(Player player) {
         if (inventories.containsKey(player)) {
             PlayerInventory inventory = player.getInventory();

@@ -1,7 +1,5 @@
-package com.kosakorner.spectator.handler;
+package com.kosakorner.spectator.player;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.kosakorner.spectator.Spectator;
 import com.kosakorner.spectator.config.Config;
 import com.kosakorner.spectator.config.Messages;
@@ -19,18 +17,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("unused")
-public class PlayerHandler implements Listener {
+public class PlayerListener implements Listener {
 
     private final Set<Player> hiddenPlayers = new HashSet<>();
-    private final BiMap<Player, Location> lastLocationCache = HashBiMap.create();
-    private final BiMap<Player, GameMode> lastGameModeCache = HashBiMap.create();
+    private final Map<Player, PlayerAttributes> attributesCache = new HashMap<>();
 
-    public PlayerHandler() {
+    public PlayerListener() {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(Spectator.instance, new Runnable() {
             @Override
             public void run() {
@@ -54,7 +52,7 @@ public class PlayerHandler implements Listener {
             @Override
             public void run() {
                 for (Map.Entry<Player, Player> entry : Spectator.spectatorRelations.entrySet()) {
-                    InventoryHandler.resendInventoy(entry.getValue(), entry.getKey());
+                    InventoryHandler.resendInventory(entry.getValue(), entry.getKey());
                 }
             }
         }, 0, 15);
@@ -62,8 +60,7 @@ public class PlayerHandler implements Listener {
 
     public void spectatePlayer(final Player player, final Player target) {
         if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-            lastLocationCache.forcePut(player, player.getLocation());
-            lastGameModeCache.forcePut(player, player.getGameMode());
+            attributesCache.put(player, new PlayerAttributes(player));
         }
         player.setGameMode(GameMode.SPECTATOR);
         if (!Spectator.trackedSpectators.contains(player)) {
@@ -75,7 +72,7 @@ public class PlayerHandler implements Listener {
         if (target != null) {
             if (Spectator.hasPermission(player, Permissions.INVENTORY)) {
                 InventoryHandler.restoreInventory(player);
-                InventoryHandler.swapInventories(player, target);
+                InventoryHandler.mirrorInventory(player, target);
             }
             player.setSpectatorTarget(null);
             player.teleport(target, PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -95,8 +92,7 @@ public class PlayerHandler implements Listener {
         // Check if the location is safe.
         Location location = null;
         if (Config.rememberSurvivalPosition) {
-            location = lastLocationCache.get(player);
-            lastLocationCache.remove(player);
+            location = attributesCache.get(player).getLocation();
         }
         if (location == null) {
             location = player.getLocation();
@@ -117,8 +113,8 @@ public class PlayerHandler implements Listener {
         if (Config.hideFromTab) {
             updatePlayerVisibility(player, true);
         }
-        GameMode gameMode = lastGameModeCache.get(player);
-        lastGameModeCache.remove(player);
+        GameMode gameMode = attributesCache.get(player).getGameMode();
+        attributesCache.remove(player);
         player.setGameMode(gameMode);
     }
 
@@ -184,7 +180,6 @@ public class PlayerHandler implements Listener {
     }
 
     @EventHandler
-    @SuppressWarnings("deprecation")
     public void onPlayerDismount(PlayerToggleSneakEvent event) {
         Player player = event.getPlayer();
         if (!Spectator.cycleHandler.isPlayerCycling(player)) {

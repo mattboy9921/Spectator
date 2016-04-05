@@ -33,7 +33,7 @@ public class SpectateCommand implements CommandExecutor {
                         sender.sendMessage(Messages.translate("Messages.Spectate.NoSpectate", "player", target.getName()));
                         return true;
                     }
-                    Spectator.playerHandler.spectatePlayer(player, target);
+                    Spectator.playerListener.spectatePlayer(player, target);
                     sender.sendMessage(Messages.translate("Messages.Spectate.Other", "player", target.getName()));
                 }
                 else {
@@ -43,11 +43,11 @@ public class SpectateCommand implements CommandExecutor {
             }
             else {
                 if (!player.getGameMode().equals(GameMode.SPECTATOR)) {
-                    Spectator.playerHandler.spectatePlayer(player, null);
+                    Spectator.playerListener.spectatePlayer(player, null);
                     sender.sendMessage(Messages.translate("Messages.Spectate.General"));
                 }
                 else {
-                    Spectator.playerHandler.unspectatePlayer(player);
+                    Spectator.playerListener.unspectatePlayer(player);
                     if (Spectator.cycleHandler.isPlayerCycling(player)) {
                         Spectator.cycleHandler.stopCycle(player);
                     }
@@ -60,7 +60,7 @@ public class SpectateCommand implements CommandExecutor {
             if (args.length == 1) {
                 Player target = Bukkit.getPlayer(args[0]);
                 if (target != null) {
-                    Spectator.playerHandler.spectatePlayer(target, null);
+                    Spectator.playerListener.spectatePlayer(target, null);
                     sender.sendMessage(Messages.translate("Messages.Spectate.GiveOther", "player", target.getName()));
                 }
                 else {
